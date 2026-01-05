@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>8c35e730-411c-4751-868c-3d6929589dda</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>utils.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,8 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="eswe_core.py" />
-    <Compile Include="utils.py" />
+    <Compile Include="amr_grid.py" />
+    <Compile Include="eswe_solver.py" />
+    <Compile Include="sph_solver.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
