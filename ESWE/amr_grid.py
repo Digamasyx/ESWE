@@ -164,7 +164,7 @@ class AMRGrid:
 			self.refinement_level[coarsen_mask] - 1, 0	
 		)
 
-	def detect_beaking_cells(self):
+	def detect_breaking_cells(self):
 		"""
 		Detecta células que violam a hipótese hidrostática
 

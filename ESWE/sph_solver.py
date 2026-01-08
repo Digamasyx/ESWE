@@ -1,9 +1,9 @@
-from mimetypes import init
+ï»¿from mimetypes import init
 import numpy as np
 from scipy.spatial import ckdtree
 
 class SPHSolver:
-	"""Solver SPH 3D para dinâmica de quebra de onda"""
+	"""Solver SPH 3D para dinamica de quebra de onda"""
 
 	def __init__(self, g=9.81, rho0=1000.0, h_sph=0.5):
 		"""
@@ -12,9 +12,9 @@ class SPHSolver:
 		Parametros:
 		-----------
 		g: float
-			Aceleração gravitacional (m/s²)
+			AceleraÃ§Ã£o gravitacional (m/sÂ²)
 		rho0: float
-			Densidade de referencia (kg/m³)
+			Densidade de referencia (kg/mÂ³)
 		h_sph: float
 			Smoothing length do kernel SPH (m)
 		"""
@@ -22,24 +22,24 @@ class SPHSolver:
 		self.rho0 = rho0
 		self.h = h_sph # Smoothing length
 
-		# Lista de particulas (cada uma é um dict)
+		# Lista de particulas (cada uma Ã© um dict)
 		self.particles = []
 
 		# Parametros SPH
 		self.c_s = 10.0 # Velocidade do som artificial (m/s)
 		self.alpha = 0.1 # Viscosidade artificial
-		self.gamma = 7.0 # Expoente equação do estado
+		self.gamma = 7.0 # Expoente equaÃ§Ã£o do estado
 
 		# Constantes do kernel
 		self._setup_kernel_constants()
 		
 	def _setup_kernel_constants(self):
-		"""Define constantes do kernel cúbico spline"""
+		"""Define constantes do kernel cÃºbico spline"""
 		self.kernel_const = 8.0 / (np.pi * self.h**3)
 
 	def cubic_spline_kernel(self, r, h):
 		"""
-		Kernel cúbico spline 3D (Wendland C2)
+		Kernel cÃºbico spline 3D (Wendland C2)
 
 		Parametros:
 		-----------
@@ -67,14 +67,14 @@ class SPHSolver:
 	
 	def cubic_spline_gradient(self, r_vec, r, h):
 		"""
-		Gradiente do kernel cúbico spline
+		Gradiente do kernel cÃºbico spline
 
 		Parametros:
 		-----------
 		r_vec: ndarray
-			Vetor distância (3D)
+			Vetor distÃ¢ncia (3D)
 		r: float
-			Magnitude da distância
+			Magnitude da distÃ¢ncia
 		h: float
 			Smoothing length
 
@@ -104,7 +104,7 @@ class SPHSolver:
 		Parametros:
 		------------
 		position: ndarray
-			Posição inicial [x, y, z] (m)
+			PosiÃ§Ã£o inicial [x, y, z] (m)
 		velocity: ndarray
 			Velocidade inicial [u, v, w] (m/s)
 		mass: float
@@ -150,17 +150,17 @@ class SPHSolver:
 			particle['density'] = max(rho, self.rho0 * 0.1)
 
 	def compute_pressure(self):
-		"""Calcula pressão usando equação de estado de Tait"""
+		"""Calcula pressÃ£o usando equaÃ§Ã£o de estado de Tait"""
 		for particle in self.particles:
-			# Equação de Tait
+			# EquaÃ§Ã£o de Tait
 			B = self.c_s**2 * self.rho0 / self.gamma
 			particle['pressure'] = B * ((particle['density'] / self.rho0) ** self.gamma - 1.0)
 			
-			# Pressão não pode ser negativa
+			# PressÃ£o nÃ£o pode ser negativa
 			particle['pressure'] = max(particle['pressure'], 0.0)
 
 	def compute_forces(self):
-		"""Calcula forças SPH"""
+		"""Calcula forÃ§as SPH"""
 		if len(self.particles) == 0:
 			return
 
@@ -188,7 +188,7 @@ class SPHSolver:
 				grad_W = self.cubic_spline_gradient(r_vec, r, self.h)
 
 
-				# Força simetrica
+				# ForÃ§a simetrica
 				pressure_term = (particle_i['pressure'] / particle_i['density']**2 +
 								 particle_j['pressure'] / particle_j['density']**2)
 				F_pressure = -particle_j['mass'] * pressure_term * grad_W
@@ -230,7 +230,7 @@ class SPHSolver:
 
 	def get_momentum_change(self, initial_velocity):
 		"""
-		Calcula a variação de momentum horizontal
+		Calcula a variaÃ§Ã£o de momentum horizontal
 
 		Parametros:
 		------------
@@ -239,7 +239,7 @@ class SPHSolver:
 		Retorna:
 		---------
 		delta_P: ndarray
-			Variação de momentum horizontal [dPx, dPy] (kg * m/s)
+			VariaÃ§Ã£o de momentum horizontal [dPx, dPy] (kg * m/s)
 		"""
 		if len(self.particles) == 0:
 			return np.zeros(2)
@@ -258,13 +258,13 @@ class SPHSolver:
 
 	def check_hydrostatic_recovery(self, threshold=0.05):
 		"""
-		Verifica criterio de desativação
+		Verifica criterio de desativaÃ§Ã£o
 
 
 		Parametros:
 		-----------
 		threshold: float
-			Limiar de aceleração vertical (fração de g)
+			Limiar de aceleraÃ§Ã£o vertical (fraÃ§Ã£o de g)
 
 		Retorna:
 		---------

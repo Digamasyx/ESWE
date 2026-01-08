@@ -1,8 +1,8 @@
-import numpy as np
+ï»¿import numpy as np
 from scipy.ndimage import laplace
 
 class ESWESolver:
-	"""Solver para as equações de Águas Rasas Extendidas"""
+	"""Solver para as equacoes de Aguas Rasas Extendidas"""
 	def __init__(self, grid, g=9.81, rho=1000.0):
 		"""
 		Inicializa o solver ESWE
@@ -12,9 +12,9 @@ class ESWESolver:
 		grid: AMRGrid
 			Grade Computacional
 		g: float
-			Aceleração Gravitacional (m/s²)
+			Aceleracao Gravitacional (m/sÂ²)
 		rho: float
-			Densidade da Água (kg/m³)
+			Densidade da Agua (kg/mÂ³)
 		"""
 		self.grid = grid
 		self.g = g
@@ -24,39 +24,39 @@ class ESWESolver:
 		self.u = np.zeros_like(grid.eta) # Velocidade horizontal x
 		self.v = np.zeros_like(grid.eta) # Velocidade horizontal y
 
-		# Parametros Físicos
+		# Parametros FÃ­sicos
 		self.C_f = 0.003 # Coef. de atrito de fundo
 		self.C_s = 0.12 # Coef. de Smagorinsky
-		self.gamma = 0.072 # Tensão Superficial (N/m)
+		self.gamma = 0.072 # TensÃ£o Superficial (N/m)
 
-		# Parametros Numéricos
-		self.C_CFL = 0.5 # Número de Courant
+		# Parametros NumÃ©ricos
+		self.C_CFL = 0.5 # NÃºmero de Courant
 
 		# Acoplamento SPH
 		self.F_ext_x = np.zeros_like(grid.eta)
 		self.F_ext_y = np.zeros_like(grid.eta)
 	def compute_cfl_timestep(self):
 		"""
-		Calcula o passo de tempo adaptativo pela condição CFL
+		Calcula o passo de tempo adaptativo pela condiÃ§Ã£o CFL
 		
 		Retorna:
 		----------
 		dt: float
-			Passo de tempo máximo permitido (s)
+			Passo de tempo mÃ¡ximo permitido (s)
 		"""
 		h = self.grid.d + self.grid.eta
 
-		# Velocidade máxima de propagação
+		# Velocidade mÃ¡xima de propagaÃ§Ã£o
 		c_wave = np.sqrt(self.g * h)
 		v_max = np.sqrt(self.u**2 + self.v**2) + c_wave
 
-		# Evita divisão por zero
+		# Evita divisÃ£o por zero
 		v_max = np.maximum(v_max, 1e-6)
 
-		# Condição CFL
+		# CondiÃ§Ã£o CFL
 		dt = self.C_CFL * np.min([self.grid.dx, self.grid.dy]) / np.max(v_max)
 
-		return min(dt, 0.01) # Limita dt máximo
+		return min(dt, 0.01) # Limita dt mÃ¡ximo
 	def compute_smagorinsky_viscosity(self):
 		"""
 		Calcula viscosidade turbulenta SGS usando modelo de Smagorinsky
@@ -64,18 +64,18 @@ class ESWESolver:
 		Retorna:
 		---------
 		nu_sgs: ndarray
-			Campo de viscosidade SGS (m²/s)
+			Campo de viscosidade SGS (mÂ²/s)
 		"""
 		# Largura do filtro
 		Delta = np.sqrt(self.grid.dx * self.grid.dy)
 
-		# Derivadas para tensor de deformação
+		# Derivadas para tensor de deformaÃ§Ã£o
 		du_dx = np.gradient(self.u, self.grid.dx, axis=1)
 		du_dy = np.gradient(self.u, self.grid.dy, axis=0)
 		dv_dx = np.gradient(self.v, self.grid.dx, axis=1)
 		dv_dy = np.gradient(self.v, self.grid.dy, axis=0)
 
-		# Módulo do tensor de taxa de deformação
+		# MÃ³dulo do tensor de taxa de deformaÃ§Ã£o
 		S_mag = np.sqrt(2 * (du_dx**2 + dv_dy**2 + 0.5*(du_dy + dv_dx) ** 2))
 
 		# Viscosidade SGS
@@ -85,7 +85,7 @@ class ESWESolver:
 
 	def compute_bed_friction(self):
 		"""
-		Calcula dissipação por atrito de fundo
+		Calcula dissipaÃ§Ã£o por atrito de fundo
 
 		Retorna:
 		---------
@@ -97,10 +97,10 @@ class ESWESolver:
 		# Magnitude da velocidade
 		u_mag = np.sqrt(self.u**2 + self.v**2)
 
-		# Evita divisão por zero
+		# Evita divisÃ£o por zero
 		h_safe = np.maximum(h, 0.01)
 
-		# Arrasto Quadrático
+		# Arrasto QuadrÃ¡tico
 		D_fundo_x = -self.C_f * self.u * u_mag / h_safe
 		D_fundo_y = -self.C_f * self.v * u_mag / h_safe
 
@@ -108,11 +108,11 @@ class ESWESolver:
 
 	def compute_advection(self):
 		"""
-		Calcula o termo de advecção
+		Calcula o termo de advecÃ§Ã£o
 
 		Retorna:
 		adv_x, adv_y: tuple of ndarray
-			Componentes de advecção
+			Componentes de advecÃ§Ã£o
 		"""
 		h = self.grid.d + self.grid.eta
 
@@ -131,12 +131,12 @@ class ESWESolver:
 
 	def compute_pressure_gradient(self):
 		"""
-		Calcula gradiente de pressão gravitacional
+		Calcula gradiente de pressÃ£o gravitacional
 
 		Retorna:
 		----------
 		G_x, G_y: tuple of ndarray
-			Componentes do gradiente de pressão
+			Componentes do gradiente de pressÃ£o
 		"""
 		h = self.grid.d + self.grid.eta
 
@@ -144,7 +144,7 @@ class ESWESolver:
 		deta_dx = np.gradient(self.grid.eta, self.grid.dx, axis=1)
 		deta_dy = np.gradient(self.grid.eta, self.grid.dx, axis=0)
 
-		# Força de pressão
+		# ForÃ§a de pressÃ£o
 		G_x = -self.g * h * deta_dx
 		G_y = -self.g * h * deta_dy
 
@@ -152,12 +152,12 @@ class ESWESolver:
 
 	def compute_turbulent_diffusion(self):
 		"""
-		Calcula difusão turbulenta
+		Calcula difusÃ£o turbulenta
 
 		Retorna:
 		----------
 		D_turb_x, D_turb_y: tuple of ndarray
-			Componentes da difusão turbulenta
+			Componentes da difusÃ£o turbulenta
 		"""
 		nu_sgs = self.compute_smagorinsky_viscosity()
 
@@ -165,7 +165,7 @@ class ESWESolver:
 		lap_u = laplace(self.u) / (self.grid.dx**2)
 		lap_v = laplace(self.v) / (self.grid.dy**2)
 
-		# Difusão
+		# DifusÃ£o
 		D_turb_x = nu_sgs * lap_u
 		D_turb_y = nu_sgs * lap_v
 
@@ -173,7 +173,7 @@ class ESWESolver:
 
 	def step(self, dt):
 		"""
-		Executa um passo de tempo usando Runge-Kutta de 2ª ordem
+		Executa um passo de tempo usando Runge-Kutta de 2Âª ordem
 
 		Parametros:
 		dt: float
@@ -196,25 +196,25 @@ class ESWESolver:
 		self.grid.eta = eta0
 		self.u = u0
 		self.v = v0
-		        
-		# Ponto médio
+				
+		# Ponto mÃ©dio
 		self._rk_stage(dt)
-        
-        # Média RK2
+		
+		# MÃ©dia RK2
 		self.grid.eta = 0.5 * (eta0 + self.grid.eta)
 		self.u = 0.5 * (u0 + self.u)
 		self.v = 0.5 * (v0 + self.v)
 
-		# Aplica condições de contorno
+		# Aplica condiÃ§Ãµes de contorno
 		self._apply_boundary_conditions()
 
 	def _rk_stage(self, dt):
-		"""Executa um estágio do método Runge-Kutta"""
+		"""Executa um estÃ¡gio do mÃ©todo Runge-Kutta"""
 
 		h = self.grid.d + self.grid.eta
 
 		div_hu = (np.gradient(h * self.u, self.grid.dx, axis=1) +
-                  np.gradient(h * self.v, self.grid.dy, axis=0))
+				  np.gradient(h * self.v, self.grid.dy, axis=0))
 		deta_dt = -div_hu
 
 		adv_x, adv_y = self.compute_advection()
@@ -225,7 +225,7 @@ class ESWESolver:
 		
 		D_fundo_x, D_fundo_y = self.compute_bed_friction()
 
-		# Taxa de variação do momentum
+		# Taxa de variaÃ§Ã£o do momentum
 		d_hu_dt_x = -adv_x + G_x + D_turb_x + D_fundo_x + self.F_ext_x
 		d_hu_dt_y = -adv_y + G_y + D_turb_y + D_fundo_y + self.F_ext_y
 
@@ -240,9 +240,9 @@ class ESWESolver:
 		self.v += dt * dv_dt
 
 	def _apply_boundary_conditions(self):
-		"""Aplica condições de contorno"""
+		"""Aplica condiÃ§Ãµes de contorno"""
 
-		# Condições u * n = 0 nas bordas
+		# CondiÃ§Ãµes u * n = 0 nas bordas
 		self.u[0, :] = 0
 		self.u[-1, :] = 0
 		self.v[:, 0] = 0
